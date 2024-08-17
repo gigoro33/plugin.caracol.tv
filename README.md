@@ -2,4 +2,4 @@
 
 Complemento no oficial para acceder al contenido de la página Caracol TV a través de Kodi.
 
-Es importante destacar que Caracol TV no está registrado ni asociado oficialmente con este complemento.
+Ni este complemento ni su autor están afiliados de ninguna manera a Caracol Televisión

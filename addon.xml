@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.caracol.tv" name="Caracol TV" version="0.0.2" provider-name="gigoro33">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.beautifulsoup4" />
+        <import addon="script.module.requests" />
+        <import addon="script.module.codequick"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="es_ES">Busca y reproduce contenido desde le sitio web de Caracol Television</summary>
+        <description lang="es_ES">Caracol Televisión es un canal de televisión abierta colombiano, propiedad de Valorem.</description>
+        <language>es</language>
+        <platform>all</platform>
+        <license>MIT</license>
+        <website>https://www.caracoltv.com/</website>
+        <source>https://github.com/gigoro33/plugin.caracol.tv/</source>
+        <disclaimer lang="es_ES">Ni este complemento ni su autor están afiliados de ninguna manera a Caracol Televisión</disclaimer>
+        <assets>
+            <icon>resources/media/icon.png</icon>
+        </assets>
+    </extension>
+</addon>
