@@ -107,6 +107,15 @@ def capitulos(plugin, url, data_show, initial_page=True):
         list_loadmores = soup.find_all('ps-list-loadmore')
 
         if initial_page:
+            promo_e = soup.find('div', {"class":'PromoE', "data-content-type": "video"})
+            Script.log(f"promo_e: {promo_e}", None, Script.INFO)
+            # if promo_e:
+            #     capitulos.extend(promo_e)
+            
+            for list_g_item in soup.find_all('li', {'class': 'ListG-items-column'}):
+                promos = list_g_item.find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
+                capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
+                
             # Si estamos en la página inicial, buscamos 'ps-promo' en todos los 'ps-list-loadmore'
             for list_loadmore in list_loadmores:
                 promos = list_loadmore.find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
