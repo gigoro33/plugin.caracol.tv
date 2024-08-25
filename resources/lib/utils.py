@@ -99,8 +99,6 @@ def iso8601_duration_to_seconds(duration):
     return total_seconds
  
 def play_video_show(url):
-    Script.log(url, None, Script.INFO)
-
     r = requests.get(url)
     
     if r.status_code == 200:

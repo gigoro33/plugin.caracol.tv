@@ -18,10 +18,8 @@ def root(plugin):
     for elem in dict_constructor:
         item = Listitem()
         item.label = elem["label"]
-        # item.art.local_thumb(elem["art"])
         if(elem["id"] == "live"):
             try:
-                # Script.log(stream_data, None, Script.INFO)
                 stream_data = en_vivo(url_constructor(elem["url"])) 
                 item.info["plot"] = stream_data.get("title")
                 item.set_path(p["src"]["hls"])

@@ -2,6 +2,7 @@ from codequick import Route, Listitem, Script
 from bs4 import BeautifulSoup
 import requests
 from resources.lib.utils import play_video_show, get_cast, iso8601_duration_to_seconds, play_youtube_video
+from urllib.parse import urlparse, urlunparse
 
 @Route.register
 def categorias(plugin, uri):
@@ -87,18 +88,36 @@ def programas(plugin, uri):
         Script.notify("Error al realizar la solicitud:", f"{url} {r.status_code}", Script.NOTIFY_ERROR)
         
 @Route.register
-def capitulos(plugin, url, data_show):
+def capitulos(plugin, url, data_show, initial_page=True):
     r = requests.get(url)
     
     if r.status_code == 200:
         soup = BeautifulSoup(r.text, 'html.parser')
         
-        next_page = soup.find('div', 'ListD-nextPage')
+        parsed_url = urlparse(url)
+        base_url = urlunparse(parsed_url._replace(query=''))
+        next_page = base_url + soup.find_all('div', 'ListD-nextPage')[-1].find('a')["data-original-href"]
+        if next_page:  
+            item = Listitem()
+            yield item.next_page(url=next_page, data_show=data_show, initial_page=False)
         
-        # capitulos = next_page.find_all_previous('ps-promo', {"class":"PromoB", "data-content-type": "video"})
-        capitulos = soup.find_all('ps-promo', {"class":"PromoB", "data-content-type": "video"})
+        capitulos = []
+
+        # Encuentra todos los elementos 'ps-list-loadmore'
+        list_loadmores = soup.find_all('ps-list-loadmore')
+
+        if initial_page:
+            # Si estamos en la página inicial, buscamos 'ps-promo' en todos los 'ps-list-loadmore'
+            for list_loadmore in list_loadmores:
+                promos = list_loadmore.find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
+                capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
+        else:
+            # Si no estamos en la página inicial, buscamos 'ps-promo' solo en el último 'ps-list-loadmore'
+            if list_loadmores:  # Verificamos que haya al menos un 'ps-list-loadmore'
+                promos = list_loadmores[-1].find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
+                capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
         
-        for capitulo in capitulos:
+        for capitulo in capitulos: 
             plot = capitulo.find('h3', {"class":"PromoB-description"})
             item = Listitem()
             item.info.mediatype = "episode"
@@ -109,14 +128,16 @@ def capitulos(plugin, url, data_show):
             item.art["thumb"] = capitulo.find('img')["data-src"]
             url = capitulo.find('a').get('href')
             options_data = play_video_show(url=url)
-            if "duration" in options_data:
-                item.info.duration = iso8601_duration_to_seconds(options_data.get("duration"))
-            if "uploadDate" in options_data:
-                item.info.date(options_data.get("uploadDate"), "%Y-%m-%dT%H:%M:%S%z")
-            if 'contentUrl' in options_data:
-                item.set_path(options_data.get('contentUrl'))
-            elif 'embedUrl' in options_data:
-                item.set_callback(play_youtube_video, url=options_data.get('embedUrl'))
-            yield item
+            if options_data:
+                if "duration" in options_data:
+                    item.info.duration = iso8601_duration_to_seconds(options_data.get("duration"))
+                if "uploadDate" in options_data:
+                    item.info.date(options_data.get("uploadDate"), "%Y-%m-%dT%H:%M:%S%z")
+                if 'contentUrl' in options_data:
+                    item.set_path(options_data.get('contentUrl'))
+                elif 'embedUrl' in options_data:
+                    item.set_callback(play_youtube_video, url=options_data.get('embedUrl'))
+                yield item
+            
     else:
         Script.notify("Error al realizar la solicitud:", f"{url} {r.status_code}", Script.NOTIFY_ERROR)
