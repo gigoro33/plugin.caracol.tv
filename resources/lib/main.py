@@ -10,7 +10,7 @@ url_constructor = utils.urljoin_partial("https://www.caracoltv.com")
 dict_constructor = [
     {"label": "Señal en vivo HD", "art": "telextrema.png", "url": "/senal-vivo", "id": "live"},
     {"label": "Programas", "art": "canalDeportivo.png", "url": "/programas", "id": "programs"},
-    {"label": "Buscar", "art": "futbolLibre.png", "url": "futbolLibre", "id": "search"}
+    {"label": "Youtube", "art": "futbolLibre.png", "url": "", "id": "youtube"}
 ]
         
 @Route.register

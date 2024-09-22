@@ -1,4 +1,4 @@
-from codequick import Route, Listitem, Script
+from codequick import Route, Listitem, Script, utils
 from bs4 import BeautifulSoup
 import requests
 from resources.lib.utils import play_video_show, get_cast, iso8601_duration_to_seconds, play_youtube_video
@@ -47,8 +47,9 @@ def secciones(plugin, uri, data_show):
                     item.set_callback(capitulos, url=url, data_show=data_show)
                     yield item
         else:
+            uri = f"{uri}/capitulos"
             item = Listitem()
-            item.label = data_show["titulo"]
+            item.label = "Capítulos"
             item.info.tvshowtitle = data_show["titulo"]
             item.info.plot = data_show["titulo"]
             item.art["thumb"] = data_show["img"]
@@ -96,10 +97,14 @@ def capitulos(plugin, url, data_show, initial_page=True):
         
         parsed_url = urlparse(url)
         base_url = urlunparse(parsed_url._replace(query=''))
-        next_page = base_url + soup.find_all('div', 'ListD-nextPage')[-1].find('a')["data-original-href"]
-        if next_page:  
-            item = Listitem()
-            yield item.next_page(url=next_page, data_show=data_show, initial_page=False)
+        try:
+            next_page = base_url + soup.find_all('div', 'ListD-nextPage')[-1].find('a')["data-original-href"]
+        except Exception as e:
+            None
+        else:
+            if next_page:  
+                item = Listitem()
+                yield item.next_page(url=next_page, data_show=data_show, initial_page=False)
         
         capitulos = []
 
@@ -107,11 +112,6 @@ def capitulos(plugin, url, data_show, initial_page=True):
         list_loadmores = soup.find_all('ps-list-loadmore')
 
         if initial_page:
-            promo_e = soup.find('div', {"class":'PromoE', "data-content-type": "video"})
-            Script.log(f"promo_e: {promo_e}", None, Script.INFO)
-            # if promo_e:
-            #     capitulos.extend(promo_e)
-            
             for list_g_item in soup.find_all('li', {'class': 'ListG-items-column'}):
                 promos = list_g_item.find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
                 capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
