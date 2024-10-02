@@ -72,7 +72,7 @@ def programas(plugin, uri):
             url = programa.find('a').get('href')
             data_show = {
                 "titulo": programa.find('span', {'class', 'Link-Media'}).text,
-                "img": programa.find('img')["data-src"],
+                "img": programa.find('img')["src"],
                 "personajes": []
             }
             
@@ -134,7 +134,7 @@ def capitulos(plugin, url, data_show, initial_page=True):
             item.listitem.setCast(data_show["personajes"])
             item.label = capitulo.find('a')["title"]
             item.info.plot = plot.text if plot else capitulo.find('a')["title"]
-            item.art["thumb"] = capitulo.find('img')["data-src"]
+            item.art["thumb"] = capitulo.find('img')["src"]
             url = capitulo.find('a').get('href')
             options_data = play_video_show(url=url)
             if options_data:
