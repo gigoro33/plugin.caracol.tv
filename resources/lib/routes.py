@@ -5,6 +5,17 @@ from resources.lib.utils import play_video_show, get_cast, iso8601_duration_to_s
 from urllib.parse import urlparse, urlunparse
 
 @Route.register
+def en_vivo(plugin):
+    dict_live = {"https://www.caracoltv.com/senal-vivo", "https://www.noticiascaracol.com/deportes/deportes-en-vivo", "https://www.noticiascaracol.com/senal-en-vivo"}
+    for elem in dict_live:
+        options_data = play_video_show(url=elem)
+        item = Listitem()
+        item.label = options_data.get('name')
+        item.info.plot = options_data.get('description')
+        item.set_path(options_data.get('contentUrl').replace("video","live-stream-playlist"))
+        yield item
+
+@Route.register
 def categorias(plugin, uri):
     item = Listitem()
     item.label = "Todos los programas"

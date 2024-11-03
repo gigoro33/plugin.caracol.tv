@@ -56,29 +56,6 @@ def embedUrl_MDSTRM(uri):
     else:
         return None
 
-def en_vivo(uri):
-    r = requests.get(uri)
-    if r.status_code == 200:
-        soup = BeautifulSoup(r.text, 'html.parser')
-        # Encuentra el div que contiene el data-mediastream
-        media_stream_div = soup.find('div', class_='MediaStreamVideoPlayer-media')
-        
-        if media_stream_div:
-            # Extrae el atributo data-mediastream
-            data_mediastream = media_stream_div.get('data-mediastream')
-            
-            # Convierte el string JSON a un objeto de Python
-            media_stream_data = json.loads(data_mediastream)
-            
-            first_stream = media_stream_data[0]
-            source_url = first_stream['sourceUrl']
-            video_id = first_stream['videoId']
-            
-            url = f"{source_url}{video_id}"            
-            return embedUrl_MDSTRM(url)
-    else: 
-        return None
-
 def iso8601_duration_to_seconds(duration):
     total_seconds = 0
     if duration.startswith('PT'):
