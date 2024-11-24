@@ -96,8 +96,9 @@ def play_video_show(url):
             
     else:
         return None
-        
-@Resolver.register
-def play_youtube_video(plugin, url):
-    # Extract a playable video url using youtubeDL
-    return plugin.extract_source(url)
+    
+def youtube_parser(url):
+    #obtiene el id de un video de youtube pasada la url
+    reg_exp = r'^.*((youtu.be/)|(v/)|(\/u/\w/)|(embed/)|(watch\?))\??v?=?([^#&?]*).*'
+    match = re.match(reg_exp, url)
+    return match.group(7) if match and len(match.group(7)) == 11 else False

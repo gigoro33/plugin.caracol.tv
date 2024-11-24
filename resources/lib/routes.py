@@ -1,12 +1,16 @@
-from codequick import Route, Listitem, Script, utils
+from codequick import Route, Listitem, Script
 from bs4 import BeautifulSoup
 import requests
-from resources.lib.utils import play_video_show, get_cast, iso8601_duration_to_seconds, play_youtube_video
+from resources.lib.utils import play_video_show, get_cast, iso8601_duration_to_seconds, youtube_parser
 from urllib.parse import urlparse, urlunparse
 
 @Route.register
 def en_vivo(plugin):
-    dict_live = {"https://www.caracoltv.com/senal-vivo", "https://www.noticiascaracol.com/deportes/deportes-en-vivo", "https://www.noticiascaracol.com/senal-en-vivo"}
+    dict_live = {
+        "https://www.caracoltv.com/senal-vivo",
+        "https://www.noticiascaracol.com/deportes/deportes-en-vivo",
+        "https://www.noticiascaracol.com/senal-en-vivo"
+    }
     for elem in dict_live:
         options_data = play_video_show(url=elem)
         item = Listitem()
@@ -155,8 +159,9 @@ def capitulos(plugin, url, data_show, initial_page=True):
                     item.info.date(options_data.get("uploadDate"), "%Y-%m-%dT%H:%M:%S%z")
                 if 'contentUrl' in options_data:
                     item.set_path(options_data.get('contentUrl'))
-                elif 'embedUrl' in options_data:
-                    item.set_callback(play_youtube_video, url=options_data.get('embedUrl'))
+                elif 'embedUrl' in options_data: #Si es un video de Youtube
+                    video_id = youtube_parser(options_data.get('embedUrl'))
+                    item.set_path(f"plugin://plugin.video.youtube/play/?video_id={video_id}")
                 yield item
             
     else:
