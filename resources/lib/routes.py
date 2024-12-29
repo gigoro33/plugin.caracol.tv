@@ -81,7 +81,7 @@ def programas(plugin, uri):
     
     if r.status_code == 200:
         soup = BeautifulSoup(r.text, 'html.parser')
-        programas = soup.find_all('div', {"class":"PromoMedia"})
+        programas = soup.find_all('div', {"class":"PromoDefaultB"})
         
         for programa in programas:
             url = programa.find('a').get('href')
@@ -161,7 +161,7 @@ def capitulos(plugin, url, data_show, initial_page=True):
                     item.set_path(options_data.get('contentUrl'))
                 elif 'embedUrl' in options_data: #Si es un video de Youtube
                     video_id = youtube_parser(options_data.get('embedUrl'))
-                    item.set_path(f"plugin://plugin.video.youtube/play/?video_id={video_id}")
+                    item.set_path(f"plugin://plugin.video.youtube/play/?video_id={video_id}&incognito=true")
                 yield item
             
     else:
