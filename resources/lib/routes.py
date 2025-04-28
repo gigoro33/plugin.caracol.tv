@@ -111,9 +111,12 @@ def capitulos(plugin, url, data_show, initial_page=True):
         soup = BeautifulSoup(r.text, 'html.parser')
         
         parsed_url = urlparse(url)
+        dominio = parsed_url.netloc
         base_url = urlunparse(parsed_url._replace(query=''))
+        
+        
         try:
-            next_page = base_url + soup.find_all('div', 'ListD-nextPage')[-1].find('a')["data-original-href"]
+            next_page = base_url + soup.find_all('div', 'List-DefaultE-nextPage')[-1].find('a')["href"]
         except Exception as e:
             None
         else:
@@ -127,19 +130,28 @@ def capitulos(plugin, url, data_show, initial_page=True):
         list_loadmores = soup.find_all('ps-list-loadmore')
 
         if initial_page:
-            for list_g_item in soup.find_all('li', {'class': 'ListG-items-column'}):
-                promos = list_g_item.find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
-                capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
+            if dominio == "www.noticiascaracol.com":
+                for list_g_item in soup.find_all('ps-list-loadmore', {'class': "List-DefaultE list"}):
+                    promos = list_g_item.find_all('ps-promo')
+                    capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
+            else:
+                for list_g_item in soup.find_all('li', {'class': 'ListG-items-column'}):
+                    promos = list_g_item.find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
+                    capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
                 
-            # Si estamos en la página inicial, buscamos 'ps-promo' en todos los 'ps-list-loadmore'
-            for list_loadmore in list_loadmores:
-                promos = list_loadmore.find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
-                capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
+                # Si estamos en la página inicial, buscamos 'ps-promo' en todos los 'ps-list-loadmore'
+                for list_loadmore in list_loadmores:
+                    promos = list_loadmore.find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
+                    capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
         else:
             # Si no estamos en la página inicial, buscamos 'ps-promo' solo en el último 'ps-list-loadmore'
             if list_loadmores:  # Verificamos que haya al menos un 'ps-list-loadmore'
-                promos = list_loadmores[-1].find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
-                capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
+                if dominio == "www.noticiascaracol.com":
+                    promos = list_loadmores[-1].find_all('ps-promo')
+                    capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
+                else:
+                    promos = list_loadmores[-1].find_all('ps-promo', {"class": 'PromoB', "data-content-type": "video"})
+                    capitulos.extend(promos)  # Agrega los resultados a la lista 'capitulos'
         
         for capitulo in capitulos: 
             plot = capitulo.find('h3', {"class":"PromoB-description"})
